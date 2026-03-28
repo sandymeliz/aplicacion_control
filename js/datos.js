@@ -339,13 +339,30 @@ function calcularPagoEmpleado(empleadoId, registros) {
 
 function _registroVacio(empleado, fecha) {
   return {
-    id: generarID(), empleadoId: empleado.id,
-    nombre: empleado.nombre, cargo: empleado.cargo,
-    fecha, entrada: null, salida: null,
-    salida_auto: false, permisos: [], minutos_permiso: 0,
-    horas_normales: null, horas_extra: null, total_horas: null,
-    pago_base: null, pago_extra: null, pago_total: null,
-    editado: false, nota: ''
+    id: generarID(), 
+    empleadoId: empleado.id,
+    nombre: empleado.nombre, 
+    cargo: empleado.cargo,
+    fecha, 
+    entrada: null, 
+    salida: null,
+    // --- NUEVOS CAMPOS ---
+    foto_entrada: null,
+    coords_entrada: null,
+    foto_salida: null,
+    coords_salida: null,
+    // ---------------------
+    salida_auto: false, 
+    permisos: [], 
+    minutos_permiso: 0,
+    horas_normales: null, 
+    horas_extra: null, 
+    total_horas: null,
+    pago_base: null, 
+    pago_extra: null, 
+    pago_total: null,
+    editado: false, 
+    nota: ''
   };
 }
 
