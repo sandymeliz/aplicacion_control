@@ -125,8 +125,13 @@ function _crearBoton(label, clase, icono, sub, callback) {
 
 // ── Acciones ────────────────────────────────────
 
-function accionEntrada() {
-  const res = registrarEntrada(empleadoSeleccionado.id);
+async function accionEntrada() {
+  // 1. Obtener datos de validación
+  const coords = await obtenerUbicacion();
+  const foto = capturarFoto();
+
+  // 2. Enviar a la base de datos (necesitarás ajustar registrarEntrada en datos.js para recibir estos 2 params)
+  const res = registrarEntrada(empleadoSeleccionado.id, foto, coords);
   _manejarResultado(res, 'ENTRADA');
 }
 function accionSalida() {
@@ -232,6 +237,32 @@ function volverMain() {
   detenerQR();
   empleadoSeleccionado = null;
   mostrarPantalla('screen-main');
+}
+
+// --- Obtener Coordenadas
+async function obtenerUbicacion() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve("No soportado");
+    
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve(${pos.coords.latitude}, ${pos.coords.longitude}),
+      () => resolve("Permiso denegado"),
+      { timeout: 5000 }
+    );
+  });
+}
+
+// ── Funcion Capturar foto ──────────────────────────────────────
+function capturarFoto() {
+  const video = document.querySelector('#qr-reader video');
+  if (!video) return null;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  
+  return canvas.toDataURL('image/jpeg', 0.5); // Comprimido al 50% para no llenar el almacenamiento
 }
 
 // ── Errores ──────────────────────────────────────
