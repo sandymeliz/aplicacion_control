@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Asistencia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       PANTALLA 1 — SELECCIÓN DE EMPLEADO
+  ═══════════════════════════════════════════ -->
+  <div id="screen-main" class="screen active">
+    <header class="app-header">
+      <div class="logo-mark">⏱</div>
+      <h1 class="app-title">ASISTENCIA</h1>
+      <p class="app-subtitle">¿Quién eres?</p>
+    </header>
+
+    <!-- Lista de empleados con indicador de estado -->
+    <div class="empleados-lista-wrap">
+      <div id="lista-empleados-btns" class="empleados-lista"></div>
+    </div>
+
+    <!-- Opción QR -->
+    <div class="qr-seccion">
+      <div class="separador">── o escanea tu QR ──</div>
+      <div id="qr-reader" class="qr-box"></div>
+      <button class="qr-toggle-btn" id="qr-btn" onclick="toggleQR()">📷 Escanear QR</button>
+    </div>
+
+    <footer class="app-footer">
+      <div id="reloj" class="reloj"></div>
+      <a href="admin.html" class="admin-link">🔒 Panel Admin</a>
+    </footer>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PANTALLA 2 — ACCIONES DEL EMPLEADO
+  ═══════════════════════════════════════════ -->
+  <div id="screen-acciones" class="screen">
+    <div class="acciones-card">
+      <button class="back-btn" onclick="volverMain()">← Volver</button>
+
+      <!-- Identificación del empleado seleccionado -->
+      <div class="acc-perfil">
+        <div class="acc-avatar">👤</div>
+        <div class="acc-datos">
+          <p class="acc-nombre-txt" id="acc-nombre">—</p>
+          <p class="acc-cargo-txt"  id="acc-cargo">—</p>
+          <p class="acc-sueldo-txt" id="acc-sueldo">—</p>
+        </div>
+      </div>
+
+      <!-- Zona de botones (se rellena dinámicamente según estado) -->
+      <div id="zona-botones" class="zona-botones"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PANTALLA 3 — CONFIRMACIÓN
+  ═══════════════════════════════════════════ -->
+  <div id="screen-confirmacion" class="screen">
+    <div class="confirm-card" id="confirm-card">
+      <div class="confirm-icon" id="confirm-icon">✅</div>
+      <h2 class="confirm-msg"  id="confirm-msg">¡Registro Exitoso!</h2>
+      <p class="confirm-nombre" id="confirm-nombre"></p>
+      <p class="confirm-cargo-label" id="confirm-cargo-label"></p>
+      <p class="confirm-hora"  id="confirm-hora"></p>
+      <div class="confirm-bar"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       OVERLAY DE ERROR
+  ═══════════════════════════════════════════ -->
+  <div id="overlay-error" class="overlay-error hidden">
+    <div class="error-box">
+      <div class="error-icon">⚠️</div>
+      <p id="error-msg" class="error-msg"></p>
+      <button onclick="cerrarError()">Entendido</button>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Admin — Asistencia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="admin-body">
+
+  <!-- ═══════════════ LOGIN ═══════════════ -->
+  <div id="screen-login" class="screen active">
+    <div class="login-card">
+      <div class="logo-mark" style="font-size:2.8rem">🔒</div>
+      <h2 class="login-title">Acceso Administrador</h2>
+      <input type="password" id="input-pass" class="input-pass" placeholder="Contraseña" />
+      <button class="confirm-btn" onclick="verificarPassword()">Entrar</button>
+      <a href="index.html" class="admin-link" style="display:block;margin-top:.5rem">← Volver al inicio</a>
+      <p id="login-error" class="login-error hidden">Contraseña incorrecta ❌</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════ PANEL ADMIN ═══════════════ -->
+  <div id="screen-admin" class="screen">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <div>
+        <h1 class="app-title" style="font-size:1.9rem">Panel Administrador</h1>
+        <p class="app-subtitle">Control de Asistencia v2.0</p>
+      </div>
+      <div class="admin-actions">
+        <button class="export-btn" onclick="exportarCSV()">⬇ CSV</button>
+        <button class="export-btn xlsx-btn" onclick="exportarXLSX()">⬇ Excel</button>
+        <button class="pagos-btn" onclick="document.getElementById('seccion-pagos').scrollIntoView({behavior:'smooth'})">💰 Ver Pagos</button>
+        <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <!-- Filtros de asistencia -->
+    <div class="filtros">
+      <label>Empleado
+        <select id="filtro-empleado" onchange="renderTabla()">
+          <option value="">Todos</option>
+        </select>
+      </label>
+      <label>Desde
+        <input type="date" id="filtro-desde" onchange="renderTabla()" />
+      </label>
+      <label>Hasta
+        <input type="date" id="filtro-hasta" onchange="renderTabla()" />
+      </label>
+      <button class="confirm-btn" style="width:auto;padding:.55rem 1.1rem;font-size:.88rem" onclick="limpiarFiltros()">Limpiar</button>
+    </div>
+
+    <!-- Resumen -->
+    <div class="resumen-grid" id="resumen-grid"></div>
+
+    <!-- Tabla de registros -->
+    <div class="tabla-wrapper">
+      <table class="tabla-registros" id="tabla-registros">
+        <thead>
+          <tr>
+            <th>Empleado</th>
+            <th>Fecha</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>H. Normales</th>
+            <th>H. Extra</th>
+            <th>Total</th>
+            <th>Pago base</th>
+            <th>Extra $</th>
+            <th>Total $</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-body"></tbody>
+      </table>
+      <p id="tabla-vacia" class="tabla-vacia hidden">No hay registros para mostrar.</p>
+    </div>
+
+    <!-- ── SECCIÓN PAGOS ── -->
+    <div class="pagos-panel" id="seccion-pagos">
+      <h3 class="panel-subtitle">💰 Generación de Pagos</h3>
+      <div class="pagos-filtros">
+        <label>Empleado
+          <select id="pago-empleado" onchange="renderPagos()">
+            <option value="">Todos</option>
+          </select>
+        </label>
+        <label>Desde
+          <input type="date" id="pago-desde" class="input-time" onchange="renderPagos()" />
+        </label>
+        <label>Hasta
+          <input type="date" id="pago-hasta" class="input-time" onchange="renderPagos()" />
+        </label>
+        <button class="export-btn" style="align-self:flex-end" onclick="exportarPagosCSV()">⬇ Exportar Pagos CSV</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tabla-pagos">
+          <thead>
+            <tr>
+              <th>Empleado</th>
+              <th>Cargo</th>
+              <th style="text-align:center">Días</th>
+              <th style="text-align:center">H. Trabajadas</th>
+              <th style="text-align:center">H. Extra</th>
+              <th style="text-align:right">Pago Base</th>
+              <th style="text-align:right">Extras $</th>
+              <th style="text-align:right">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-pagos-body"></tbody>
+        </table>
+      </div>
+      <p style="font-size:.75rem;color:var(--texto-sub);margin-top:.8rem">
+        ⚡ Cierre automático a las <strong>18:30</strong> · Almuerzo descontado: <strong>30 min</strong> · Jornada normal: <strong>9.5h efectivas</strong>
+      </p>
+    </div>
+
+    <!-- ── GESTIÓN DE EMPLEADOS ── -->
+    <div class="empleados-panel">
+      <h3 class="panel-subtitle">👤 Gestión de Empleados</h3>
+      <div class="empleado-form">
+        <input type="text" id="nuevo-nombre" class="input-text" placeholder="Nombre del empleado" style="flex:1;min-width:180px" />
+        <select id="nuevo-cargo" style="padding:.7rem 1rem;border-radius:var(--radio);border:2px solid var(--borde);background:var(--fondo3);color:var(--texto);font-size:1rem;font-family:var(--font-body);appearance:none;cursor:pointer">
+          <option value="">— Cargo —</option>
+          <option value="administrador">Administrador ($20/día)</option>
+          <option value="costurera">Costurera ($20/día)</option>
+          <option value="empaque">Empaque ($15/día)</option>
+          <option value="estampador">Estampador ($1.20/h)</option>
+        </select>
+        <button class="confirm-btn" style="width:auto;padding:.7rem 1.4rem" onclick="agregarEmpleado()">+ Agregar</button>
+      </div>
+      <ul id="lista-empleados" class="lista-empleados"></ul>
+    </div>
+
+    <!-- Enlace generador QR -->
+    <div style="text-align:center;margin-bottom:2rem">
+      <a href="qr-empleados.html" style="color:var(--acento);font-size:.9rem;text-decoration:none">🖨 Imprimir tarjetas QR de empleados</a>
+    </div>
+
+  </div><!-- /screen-admin -->
+
+  <!-- ═══════════════ MODAL EDICIÓN REGISTRO ═══════════════ -->
+  <div id="modal-edicion" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 class="modal-title">Editar Registro</h3>
+      <p style="color:var(--texto-sub);font-size:.88rem;margin-bottom:1rem">
+        Empleado: <strong id="edit-empleado-nombre" style="color:var(--texto)">—</strong>
+        &nbsp;|&nbsp; Fecha: <strong id="edit-fecha" style="color:var(--texto)">—</strong>
+      </p>
+      <div class="modal-grid">
+        <div class="modal-field">
+          <label>Hora de Entrada</label>
+          <input type="time" id="edit-entrada" class="input-time" />
+        </div>
+        <div class="modal-field">
+          <label>Hora de Salida</label>
+          <input type="time" id="edit-salida" class="input-time" />
+        </div>
+        <div class="modal-field full">
+          <label>Nota (opcional)</label>
+          <input type="text" id="edit-nota" class="input-text" placeholder="Ej: Corrección por olvido de marcación" style="font-size:.95rem" />
+        </div>
+      </div>
+      <p style="font-size:.75rem;color:var(--texto-sub);margin-top:.2rem">
+        ⚠ Esta edición quedará registrada en el log de auditoría.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="cerrarModalEdicion()">Cancelar</button>
+        <button class="btn-guardar"  onclick="guardarEdicion()">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

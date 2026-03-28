@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generador de Códigos QR — Asistencia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <!-- Librería QR Code Generator -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--fondo); }
+    .qr-gen-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .qr-gen-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .qr-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    .qr-tarjeta {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: #111;
+    }
+    .qr-tarjeta canvas, .qr-tarjeta img { margin: 0 auto .8rem; display: block; }
+    .qr-nombre {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 1rem;
+      color: #111;
+      word-break: break-word;
+    }
+    .qr-empresa {
+      font-size: .75rem;
+      color: #666;
+      margin-top: .2rem;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .qr-gen-header p { display: none; }
+      body { background: #fff; }
+    }
+    .print-btn {
+      display: block;
+      margin: 1.5rem auto 0;
+      padding: .9rem 2.5rem;
+      background: linear-gradient(135deg, var(--acento), #0288D1);
+      border: none;
+      border-radius: 99px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 900;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="qr-gen-wrapper">
+    <div class="qr-gen-header">
+      <h1 class="app-title">Códigos QR de Empleados</h1>
+      <p class="app-subtitle">Imprime esta página y entrega cada tarjeta a su empleado</p>
+      <a href="index.html" class="admin-link no-print" style="display:inline-block;margin-top:.5rem">← Volver</a>
+      <button class="print-btn no-print" onclick="window.print()">🖨 Imprimir Tarjetas</button>
+    </div>
+    <div class="qr-cards-grid" id="qr-cards-grid"></div>
+  </div>
+
+  <script src="js/datos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const empleados = obtenerEmpleados();
+      const grid = document.getElementById('qr-cards-grid');
+
+      empleados.forEach(nombre => {
+        const tarjeta = document.createElement('div');
+        tarjeta.className = 'qr-tarjeta';
+
+        const qrDiv = document.createElement('div');
+        qrDiv.id = 'qr-' + nombre.replace(/\s+/g, '-');
+
+        const nombreEl  = document.createElement('p');
+        nombreEl.className  = 'qr-nombre';
+        nombreEl.textContent = nombre;
+
+        const empresaEl = document.createElement('p');
+        empresaEl.className  = 'qr-empresa';
+        empresaEl.textContent = 'Control de Asistencia';
+
+        tarjeta.appendChild(qrDiv);
+        tarjeta.appendChild(nombreEl);
+        tarjeta.appendChild(empresaEl);
+        grid.appendChild(tarjeta);
+
+        // Generar QR cuyo contenido ES el nombre del empleado
+        new QRCode(qrDiv, {
+          text: nombre,
+          width: 160,
+          height: 160,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      });
+    });
+  </script>
+</body>
+</html>
