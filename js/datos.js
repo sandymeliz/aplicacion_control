@@ -313,16 +313,35 @@ function calcularPagoEmpleado(empleadoId, registros) {
     diasTrabajados++;
     horasTotales += r.total_horas || 0;
 
-    // Usar los valores ya calculados y guardados en el registro
-    // (que ya aplican la regla de piso)
-    pagoBase  += r.pago_base  || 0;
-    pagoExtra += r.pago_extra || 0;
+    // Recalcular siempre desde los minutos reales, ignorando pago_base/pago_extra
+    // guardados (pueden ser de versiones anteriores del código)
+    const brutoMin    = calcularMinutos(r.entrada, r.salida);
+    const efectivoMin = Math.max(0, brutoMin - CONFIG.MINUTOS_ALMUERZO - (r.minutos_permiso || 0));
+    const limiteMin   = 570;
 
-    // Horas extra reales (para mostrar en resumen)
-    const limMin   = 570 - (r.minutos_permiso || 0);
-    const totalMin = (r.total_horas || 0) * 60;
-    const extraMin = Math.max(0, totalMin - limMin);
-    horasExtra    += Math.floor(extraMin / 60); // piso también en el resumen
+    const normMin  = Math.min(efectivoMin, limiteMin);
+    const extraMin = Math.max(0, efectivoMin - limiteMin);
+
+    const normMinPagados  = Math.floor(normMin  / 60) * 60;
+    const extraMinPagados = Math.floor(extraMin / 60) * 60;
+    const hNormPagadas    = normMinPagados  / 60;
+    const hExtraPagadas   = extraMinPagados / 60;
+
+    horasExtra += hExtraPagadas;
+
+    if (cargo.tipo === 'diario') {
+      const jornadaCompleta = efectivoMin >= limiteMin;
+      if (jornadaCompleta) {
+        pagoBase += cargo.salario;
+      } else {
+        const tarifaHora = cargo.salario / 9.5;
+        pagoBase += hNormPagadas * tarifaHora;
+      }
+      pagoExtra += hExtraPagadas * cargo.extra;
+    } else {
+      pagoBase  += hNormPagadas  * cargo.salario;
+      pagoExtra += hExtraPagadas * cargo.extra;
+    }
   });
 
   return {
