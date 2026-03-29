@@ -250,7 +250,7 @@ async function obtenerUbicacion() {
     if (!navigator.geolocation) return resolve("No soportado");
     
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve(${pos.coords.latitude}, ${pos.coords.longitude}),
+      (pos) => resolve(`${pos.coords.latitude}, ${pos.coords.longitude}`), // <-- Faltaban las comillas invertidas
       () => resolve("Permiso denegado"),
       { timeout: 5000 }
     );
