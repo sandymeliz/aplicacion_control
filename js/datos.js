@@ -313,20 +313,16 @@ function calcularPagoEmpleado(empleadoId, registros) {
     diasTrabajados++;
     horasTotales += r.total_horas || 0;
 
-    const limMin  = 570 - (r.minutos_permiso || 0);  // jornada normal ajustada
-    const totalMin = (r.total_horas || 0) * 60;
-    const normMin  = Math.min(totalMin, limMin);
-    const extraMin = Math.max(0, totalMin - limMin);
-    const hExtra   = extraMin / 60;
-    horasExtra    += hExtra;
+    // Usar los valores ya calculados y guardados en el registro
+    // (que ya aplican la regla de piso)
+    pagoBase  += r.pago_base  || 0;
+    pagoExtra += r.pago_extra || 0;
 
-    if (cargo.tipo === 'diario') {
-      pagoBase  += cargo.salario;
-      pagoExtra += hExtra * cargo.extra;
-    } else {
-      pagoBase  += (normMin / 60) * cargo.salario;
-      pagoExtra += hExtra * cargo.extra;
-    }
+    // Horas extra reales (para mostrar en resumen)
+    const limMin   = 570 - (r.minutos_permiso || 0);
+    const totalMin = (r.total_horas || 0) * 60;
+    const extraMin = Math.max(0, totalMin - limMin);
+    horasExtra    += Math.floor(extraMin / 60); // piso también en el resumen
   });
 
   return {
@@ -396,23 +392,41 @@ function _calcularTotales(r) {
   const brutoMin    = calcularMinutos(r.entrada, r.salida);
   const efectivoMin = Math.max(0, brutoMin - CONFIG.MINUTOS_ALMUERZO - (r.minutos_permiso || 0));
   const limiteMin   = 570; // 9.5h × 60
-  const normMin     = Math.min(efectivoMin, limiteMin);
-  const extraMin    = Math.max(0, efectivoMin - limiteMin);
 
-  r.horas_normales = formatearHoras(normMin);
-  r.horas_extra    = formatearHoras(extraMin);
+  const normMin  = Math.min(efectivoMin, limiteMin);
+  const extraMin = Math.max(0, efectivoMin - limiteMin);
+
+  // Horas enteras hacia abajo (piso) para cada tramo
+  // Ej: 3h 15min → 3h pagadas; 30min → 0h pagadas
+  const normMinPagados  = Math.floor(normMin  / 60) * 60; // piso en horas completas
+  const extraMinPagados = Math.floor(extraMin / 60) * 60;
+
+  r.horas_normales = formatearHoras(normMin);   // se muestra el tiempo real trabajado
+  r.horas_extra    = formatearHoras(extraMin);  // se muestra el tiempo real trabajado
   r.total_horas    = Math.round(efectivoMin) / 60;
 
   const cargo  = obtenerCargo(r.cargo);
-  const hExtra = extraMin / 60;
+  const hNormPagadas  = normMinPagados  / 60;
+  const hExtraPagadas = extraMinPagados / 60;
 
   if (cargo.tipo === 'diario') {
-    r.pago_base  = cargo.salario;
-    r.pago_extra = Math.round(hExtra * cargo.extra * 100) / 100;
+    // Jornada completa (≥ 570 min efectivos): cobra el día fijo sin importar fracciones
+    // Jornada incompleta: se paga proporcional por horas enteras trabajadas
+    const jornadaCompleta = efectivoMin >= limiteMin;
+    if (jornadaCompleta) {
+      r.pago_base = cargo.salario;
+    } else {
+      // Tarifa implícita por hora = salario_dia / 9.5h
+      const tarifaHora = cargo.salario / 9.5;
+      r.pago_base = Math.round(hNormPagadas * tarifaHora * 100) / 100;
+    }
+    r.pago_extra = Math.round(hExtraPagadas * cargo.extra * 100) / 100;
   } else {
-    r.pago_base  = Math.round((normMin / 60) * cargo.salario * 100) / 100;
-    r.pago_extra = Math.round(hExtra * cargo.extra * 100) / 100;
+    // por_hora (estampador): siempre piso, sin distinción
+    r.pago_base  = Math.round(hNormPagadas  * cargo.salario * 100) / 100;
+    r.pago_extra = Math.round(hExtraPagadas * cargo.extra   * 100) / 100;
   }
+
   r.pago_total = Math.round((r.pago_base + r.pago_extra) * 100) / 100;
 }
 
