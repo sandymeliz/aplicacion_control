@@ -263,11 +263,15 @@ function capturarFoto() {
   if (!video) return null;
 
   const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
+  // REDUCIR TAMAÑO PARA AHORRAR ESPACIO
+  canvas.width = 200; 
+  canvas.height = 150; 
   
-  return canvas.toDataURL('image/jpeg', 0.5); // Comprimido al 50% para no llenar el almacenamiento
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+  // Calidad 0.3 (30%) para que la foto pese muy poco
+  return canvas.toDataURL('image/jpeg', 0.3); 
 }
 
 // ── Errores ──────────────────────────────────────
