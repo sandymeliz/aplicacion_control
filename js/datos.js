@@ -132,7 +132,7 @@ function guardarRegistros(registros) {
 
 // ── Entrada ───────────────────────────────────
 
-function registrarEntrada(empleadoId) {
+function registrarEntrada(empleadoId, foto = null, coords = null) { // <--- Agregar parámetros
   const empleado = obtenerEmpleados().find(e => e.id === empleadoId);
   if (!empleado) return { ok: false, mensaje: 'Empleado no encontrado.' };
 
@@ -145,6 +145,11 @@ function registrarEntrada(empleadoId) {
 
   const nuevo = _registroVacio(empleado, hoy);
   nuevo.entrada = horaActual();
+  
+  // GUARDAR LOS DATOS NUEVOS
+  nuevo.foto_entrada = foto;
+  nuevo.coords_entrada = coords;
+
   registros.push(nuevo);
   guardarRegistros(registros);
   return { ok: true, nombre: empleado.nombre, cargo: empleado.cargo };
@@ -152,7 +157,7 @@ function registrarEntrada(empleadoId) {
 
 // ── Salida normal ─────────────────────────────
 
-function registrarSalida(empleadoId) {
+function registrarSalida(empleadoId, foto = null, coords = null) { // <--- Agregar parámetros
   const empleado = obtenerEmpleados().find(e => e.id === empleadoId);
   if (!empleado) return { ok: false, mensaje: 'Empleado no encontrado.' };
 
@@ -163,6 +168,11 @@ function registrarSalida(empleadoId) {
   const r = registros[idx];
   _cerrarPermisoAbierto(r);
   r.salida = horaActual();
+
+  // GUARDAR LOS DATOS NUEVOS
+  r.foto_salida = foto;
+  r.coords_salida = coords;
+
   _calcularTotales(r);
   guardarRegistros(registros);
   return { ok: true, nombre: empleado.nombre, cargo: empleado.cargo };
