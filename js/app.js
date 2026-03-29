@@ -134,8 +134,13 @@ async function accionEntrada() {
   const res = registrarEntrada(empleadoSeleccionado.id, foto, coords);
   _manejarResultado(res, 'ENTRADA');
 }
-function accionSalida() {
-  const res = registrarSalida(empleadoSeleccionado.id);
+async function accionSalida() { // <--- Debe ser async
+  // 1. Obtener datos de validación
+  const coords = await obtenerUbicacion();
+  const foto = capturarFoto();
+
+  // 2. Enviar con los nuevos parámetros
+  const res = registrarSalida(empleadoSeleccionado.id, foto, coords);
   _manejarResultado(res, 'SALIDA');
 }
 function accionSalidaPermiso() {
