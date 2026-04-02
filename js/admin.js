@@ -188,7 +188,7 @@ function guardarEdicion() {
 
 // ── Gestión de empleados ───────────────────────
 
-function renderListaEmpleados() {
+async function renderListaEmpleados() {
   const ul = document.getElementById('lista-empleados');
   const empleados = obtenerEmpleados();
   ul.innerHTML = empleados.length === 0
