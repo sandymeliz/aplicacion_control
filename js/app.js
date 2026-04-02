@@ -7,6 +7,13 @@
  *   3. Pantalla de confirmación → mensaje 3 segundos → vuelve al inicio
  */
 
+// ── Importación de datos ─────────────────────────────────────
+import { 
+  obtenerEmpleados, obtenerCargo, estadoEmpleadoHoy, 
+  registrarEntrada, registrarSalida, registrarSalidaPermiso, 
+  registrarEntradaPermiso, horaActual, fechaHoy 
+} from './datos.js';
+
 // ── Estado ─────────────────────────────────────
 let empleadoSeleccionado = null;   // { id, nombre, cargo }
 let qrActivo             = false;
