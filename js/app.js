@@ -37,25 +37,30 @@ async function cargarListaEmpleados() {
   const lista = document.getElementById('lista-empleados-btns');
   if (!lista) return;
   
-  lista.innerHTML = '<p style="color:var(--texto-sub);text-align:center;padding:1rem">Cargando empleados...</p>';
+  // 1. Mostrar feedback visual mientras Firebase responde
+  lista.innerHTML = '<p style="color:var(--texto-sub);text-align:center;padding:1rem">Conectando con la base de datos...</p>';
 
   try {
-    const empleados = await obtenerEmpleados(); // Esperamos a Firebase
+    // 2. ESPERAR a que lleguen los empleados
+    const empleados = await obtenerEmpleados(); 
 
     if (empleados.length === 0) {
-      lista.innerHTML = '<p style="color:var(--texto-sub);text-align:center;padding:1rem">No hay empleados en la base de datos.</p>';
+      lista.innerHTML = '<p style="color:var(--texto-sub);text-align:center;padding:1rem">No hay empleados registrados en Firebase.</p>';
       return;
     }
 
     lista.innerHTML = '';
+    
+    // 3. Usar for...of para poder usar 'await' dentro del bucle
     for (const emp of empleados) {
       const cargo = obtenerCargo(emp.cargo);
-      const estado = await estadoEmpleadoHoy(emp.id); // Esperamos el estado
+      
+      // 4. ESPERAR el estado de cada empleado (esto es lo que suele fallar)
+      const estado = await estadoEmpleadoHoy(emp.id); 
       const indicador = _indicadorEstado(estado);
 
       const btn = document.createElement('button');
       btn.className = 'empleado-btn';
-      // Importante: usamos window.seleccionarEmpleado para que el click funcione
       btn.innerHTML = `
         <span class="emp-indicador ${indicador.clase}">${indicador.icono}</span>
         <span class="emp-info">
@@ -64,12 +69,13 @@ async function cargarListaEmpleados() {
         </span>
         <span class="emp-flecha">›</span>
       `;
+      // Usar la referencia global para que el click funcione
       btn.onclick = () => window.seleccionarEmpleado(emp);
       lista.appendChild(btn);
     }
   } catch (error) {
-    console.error("Error al cargar:", error);
-    lista.innerHTML = '<p style="color:var(--rojo);text-align:center">Error de conexión con Firebase.</p>';
+    console.error("Error crítico:", error);
+    lista.innerHTML = '<p style="color:var(--rojo);text-align:center">Error al conectar con la nube.</p>';
   }
 }
 
@@ -298,8 +304,8 @@ function cerrarError() {
 }
 
 // AL FINAL DEL ARCHIVO, agrega también estas funciones para los botones:
+window.seleccionarEmpleado = seleccionarEmpleado;
 window.cerrarError = cerrarError;
 window.volverMain = volverMain;
 window.toggleQR = toggleQR;
-window.seleccionarEmpleado = seleccionarEmpleado; // ¡Esta es vital para que los botones de la lista funcionen!
 
