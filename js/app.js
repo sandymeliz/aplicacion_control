@@ -77,19 +77,16 @@ function _indicadorEstado(estado) {
 
 // ── Pantalla 1 → 2: Selección de empleado ──────
 
-function seleccionarEmpleado(emp) {
+async function seleccionarEmpleado(emp) {
   empleadoSeleccionado = emp;
-  detenerQR();
+  
+  // ESPERAR a que Firebase nos diga en qué estado está el empleado
+  const estado = await estadoEmpleadoHoy(emp.id); 
 
-  const cargo  = obtenerCargo(emp.cargo);
-  const estado = estadoEmpleadoHoy(emp.id);
-
-  // Rellenar cabecera de la pantalla de acciones
-  document.getElementById('acc-nombre').textContent  = emp.nombre;
-  document.getElementById('acc-cargo').textContent   = cargo.label;
-  document.getElementById('acc-sueldo').textContent  = cargo.descripcion;
-
-  // Mostrar botones según estado actual
+  // Rellenar datos visuales
+  document.getElementById('acc-nombre').textContent = emp.nombre;
+  
+  // Ahora sí, dibujar los botones según el estado real
   _renderBotonesAccion(estado);
 
   mostrarPantalla('screen-acciones');
