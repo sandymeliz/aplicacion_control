@@ -207,16 +207,27 @@ function renderListaEmpleados() {
   cargarFiltroEmpleados();
 }
 
-function agregarEmpleado() {
+async function agregarEmpleado() {
   const nombre = document.getElementById('nuevo-nombre').value.trim();
   const cargo  = document.getElementById('nuevo-cargo').value;
+  
   if (!nombre) { alert('Escribe el nombre del empleado.'); return; }
   if (!cargo)  { alert('Selecciona un cargo.'); return; }
-  const res = agregarEmpleadoDB(nombre, cargo);
-  if (!res.ok) { alert(res.mensaje); return; }
+
+  // AGREGAMOS 'await' aquí para esperar a Firebase
+  const res = await agregarEmpleadoDB(nombre, cargo); 
+
+  if (!res.ok) { 
+    alert(res.mensaje); 
+    return; 
+  }
+
   document.getElementById('nuevo-nombre').value = '';
   document.getElementById('nuevo-cargo').value  = '';
-  renderListaEmpleados();
+  
+  // Refrescamos la lista (también debe ser async o esperar internamente)
+  await renderListaEmpleados(); 
+  alert('¡Empleado agregado con éxito!');
 }
 
 function editarEmpleadoUI(id, nombre, cargo) {
