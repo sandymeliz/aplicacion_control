@@ -33,7 +33,7 @@ function iniciarReloj() {
   setInterval(tick, 1000);
 }
 
-function cargarListaEmpleados() {
+async function cargarListaEmpleados() {
   const lista = document.getElementById('lista-empleados-btns');
   if (!lista) return;
   lista.innerHTML = '';
