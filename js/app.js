@@ -171,7 +171,7 @@ async function accionEntradaPermiso() {
   _manejarResultado(res, 'ENTRADA_PERMISO');
 }
 
-async function _manejarResultado(res, tipo) {
+function _manejarResultado(res, tipo) {
   if (!res.ok) { mostrarError(res.mensaje); return; }
   mostrarConfirmacion(res.nombre, res.cargo, tipo);
 }
