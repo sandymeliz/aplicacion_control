@@ -162,16 +162,16 @@ async function accionSalida() { // <--- Debe ser async
   const res = await registrarSalida(empleadoSeleccionado.id, foto, coords);
   _manejarResultado(res, 'SALIDA');
 }
-function accionSalidaPermiso() {
+async function accionSalidaPermiso() {
   const res = await registrarSalidaPermiso(empleadoSeleccionado.id);
   _manejarResultado(res, 'SALIDA_PERMISO');
 }
-function accionEntradaPermiso() {
+async function accionEntradaPermiso() {
   const res = await registrarEntradaPermiso(empleadoSeleccionado.id);
   _manejarResultado(res, 'ENTRADA_PERMISO');
 }
 
-function _manejarResultado(res, tipo) {
+async function _manejarResultado(res, tipo) {
   if (!res.ok) { mostrarError(res.mensaje); return; }
   mostrarConfirmacion(res.nombre, res.cargo, tipo);
 }
@@ -308,4 +308,8 @@ window.seleccionarEmpleado = seleccionarEmpleado;
 window.cerrarError = cerrarError;
 window.volverMain = volverMain;
 window.toggleQR = toggleQR;
+window.accionEntrada = accionEntrada;
+window.accionSalida = accionSalida;
+window.accionSalidaPermiso = accionSalidaPermiso;
+window.accionEntradaPermiso = accionEntradaPermiso;
 
