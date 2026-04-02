@@ -137,7 +137,7 @@ async function accionEntrada() {
   const foto = capturarFoto();
 
   // 2. Enviar a la base de datos (necesitarás ajustar registrarEntrada en datos.js para recibir estos 2 params)
-  const res = registrarEntrada(empleadoSeleccionado.id, foto, coords);
+  const res = await registrarEntrada(empleadoSeleccionado.id, foto, coords);
   _manejarResultado(res, 'ENTRADA');
 }
 async function accionSalida() { // <--- Debe ser async
