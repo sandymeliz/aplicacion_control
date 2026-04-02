@@ -146,15 +146,15 @@ async function accionSalida() { // <--- Debe ser async
   const foto = capturarFoto();
 
   // 2. Enviar con los nuevos parámetros
-  const res = registrarSalida(empleadoSeleccionado.id, foto, coords);
+  const res = await registrarSalida(empleadoSeleccionado.id, foto, coords);
   _manejarResultado(res, 'SALIDA');
 }
 function accionSalidaPermiso() {
-  const res = registrarSalidaPermiso(empleadoSeleccionado.id);
+  const res = await registrarSalidaPermiso(empleadoSeleccionado.id);
   _manejarResultado(res, 'SALIDA_PERMISO');
 }
 function accionEntradaPermiso() {
-  const res = registrarEntradaPermiso(empleadoSeleccionado.id);
+  const res = await registrarEntradaPermiso(empleadoSeleccionado.id);
   _manejarResultado(res, 'ENTRADA_PERMISO');
 }
 
