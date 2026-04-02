@@ -36,33 +36,40 @@ function iniciarReloj() {
 async function cargarListaEmpleados() {
   const lista = document.getElementById('lista-empleados-btns');
   if (!lista) return;
-  lista.innerHTML = '<p style="text-align:center; opacity:0.6;">Cargando estados...</p>';
   
-  const empleados = await obtenerEmpleados(); // Esperamos a Firebase
+  lista.innerHTML = '<p style="color:var(--texto-sub);text-align:center;padding:1rem">Cargando empleados...</p>';
 
-  lista.innerHTML = '';
-  
-  // Usamos for...of para poder usar 'await' correctamente dentro del ciclo
-  for (const emp of empleados) {
-    const cargo = obtenerCargo(emp.cargo); //
-    
-    // AQUÍ ESTÁ EL CAMBIO CLAVE: Esperamos el estado de cada uno
-    const estado = await estadoEmpleadoHoy(emp.id); 
-    
-    const indicador = _indicadorEstado(estado); //
+  try {
+    const empleados = await obtenerEmpleados(); // Esperamos a Firebase
 
-    const btn = document.createElement('button');
-    btn.className = 'empleado-btn';
-    btn.innerHTML = `
-      <span class="emp-indicador ${indicador.clase}">${indicador.icono}</span>
-      <span class="emp-info">
-        <span class="emp-nombre">${emp.nombre}</span>
-        <span class="emp-cargo">${cargo.label}</span>
-      </span>
-      <span class="emp-flecha">›</span>
-    `;
-    btn.onclick = () => seleccionarEmpleado(emp);
-    lista.appendChild(btn);
+    if (empleados.length === 0) {
+      lista.innerHTML = '<p style="color:var(--texto-sub);text-align:center;padding:1rem">No hay empleados en la base de datos.</p>';
+      return;
+    }
+
+    lista.innerHTML = '';
+    for (const emp of empleados) {
+      const cargo = obtenerCargo(emp.cargo);
+      const estado = await estadoEmpleadoHoy(emp.id); // Esperamos el estado
+      const indicador = _indicadorEstado(estado);
+
+      const btn = document.createElement('button');
+      btn.className = 'empleado-btn';
+      // Importante: usamos window.seleccionarEmpleado para que el click funcione
+      btn.innerHTML = `
+        <span class="emp-indicador ${indicador.clase}">${indicador.icono}</span>
+        <span class="emp-info">
+          <span class="emp-nombre">${emp.nombre}</span>
+          <span class="emp-cargo">${cargo.label}</span>
+        </span>
+        <span class="emp-flecha">›</span>
+      `;
+      btn.onclick = () => window.seleccionarEmpleado(emp);
+      lista.appendChild(btn);
+    }
+  } catch (error) {
+    console.error("Error al cargar:", error);
+    lista.innerHTML = '<p style="color:var(--rojo);text-align:center">Error de conexión con Firebase.</p>';
   }
 }
 
@@ -290,7 +297,8 @@ function cerrarError() {
   document.getElementById('overlay-error').classList.add('hidden');
 }
 
-// Exponer funciones al objeto global window para que los onclick funcionen
+// AL FINAL DEL ARCHIVO, agrega también estas funciones para los botones:
 window.cerrarError = cerrarError;
 window.volverMain = volverMain;
 window.toggleQR = toggleQR;
+window.seleccionarEmpleado = seleccionarEmpleado; // ¡Esta es vital para que los botones de la lista funcionen!
