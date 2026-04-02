@@ -6,6 +6,14 @@
  * exportación CSV/XLSX y cierre automático de jornadas.
  */
 
+// ── IMportar datos ──────────────────────────────────────
+import { 
+  CONFIG, obtenerEmpleados, obtenerRegistros, obtenerCargo, 
+  listarCargos, agregarEmpleadoDB, eliminarEmpleadoDB, 
+  editarEmpleadoDB, ejecutarCierreAutomatico, editarRegistroAdmin, 
+  calcularPagoEmpleado, calcularResumen, fechaHoy, formatearFecha 
+} from './datos.js';
+
 // ── Login ──────────────────────────────────────
 
 function verificarPassword() {
@@ -332,3 +340,20 @@ function _descargar(blob, nombre) {
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
+
+// --- EXPOSICIÓN GLOBAL PARA HTML ---
+// Esto permite que los atributos 'onclick' del HTML encuentren las funciones
+window.verificarPassword = verificarPassword;
+window.cerrarSesion = cerrarSesion;
+window.exportarCSV = exportarCSV;
+window.exportarXLSX = exportarXLSX;
+window.limpiarFiltros = limpiarFiltros;
+window.renderTabla = renderTabla;
+window.renderPagos = renderPagos;
+window.abrirModalEdicion = abrirModalEdicion;
+window.cerrarModalEdicion = cerrarModalEdicion;
+window.guardarEdicion = guardarEdicion;
+window.agregarEmpleado = agregarEmpleado;
+window.editarEmpleadoUI = editarEmpleadoUI;
+window.eliminarEmpleadoAdmin = eliminarEmpleadoAdmin;
+window.exportarPagosCSV = exportarPagosCSV;
