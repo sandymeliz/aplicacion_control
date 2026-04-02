@@ -190,13 +190,33 @@ async function registrarEntradaPermiso(empleadoId) {
 
 // ── Estado del empleado hoy ────────────────────
 
+import { query, where, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 async function estadoEmpleadoHoy(empleadoId) {
-  const hoy = fechaHoy();
-  const registros = await obtenerRegistros();
-  const r = registros.find(x => x.empleadoId === empleadoId && x.fecha === hoy);
-  if (!r || !r.entrada)                 return 'sin_entrada';
-  if (r.salida)                          return 'jornada_cerrada';
-  if (r.permisos.find(p => !p.entrada)) return 'en_permiso';
+  const hoy = fechaHoy(); // Obtiene YYYY-MM-DD
+  
+  // Referencia a la colección 'registros' en Firestore
+  const registrosRef = collection(_db, 'registros');
+  
+  // Consultamos solo el documento que coincida con el ID y la fecha de hoy
+  const q = query(
+    registrosRef, 
+    where("empleadoId", "==", empleadoId), 
+    where("fecha", "==", hoy),
+    limit(1)
+  );
+
+  const querySnapshot = await getDocs(q);
+  
+  if (querySnapshot.empty) return 'sin_entrada';
+
+  const r = querySnapshot.docs[0].data();
+
+  // Lógica de estados
+  if (!r.entrada) return 'sin_entrada';
+  if (r.salida) return 'jornada_cerrada';
+  if (r.permisos && r.permisos.find(p => !p.entrada)) return 'en_permiso';
+  
   return 'en_jornada';
 }
 
