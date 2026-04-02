@@ -289,3 +289,8 @@ function mostrarError(mensaje) {
 function cerrarError() {
   document.getElementById('overlay-error').classList.add('hidden');
 }
+
+// Exponer funciones al objeto global window para que los onclick funcionen
+window.cerrarError = cerrarError;
+window.volverMain = volverMain;
+window.toggleQR = toggleQR;
