@@ -297,8 +297,3 @@ function cerrarError() {
   document.getElementById('overlay-error').classList.add('hidden');
 }
 
-// AL FINAL DEL ARCHIVO, agrega también estas funciones para los botones:
-window.cerrarError = cerrarError;
-window.volverMain = volverMain;
-window.toggleQR = toggleQR;
-window.seleccionarEmpleado = seleccionarEmpleado; // ¡Esta es vital para que los botones de la lista funcionen!
