@@ -36,18 +36,20 @@ function iniciarReloj() {
 async function cargarListaEmpleados() {
   const lista = document.getElementById('lista-empleados-btns');
   if (!lista) return;
+  lista.innerHTML = '<p style="text-align:center; opacity:0.6;">Cargando estados...</p>';
+  
+  const empleados = await obtenerEmpleados(); // Esperamos a Firebase
+
   lista.innerHTML = '';
-  const empleados = obtenerEmpleados();
-
-  if (empleados.length === 0) {
-    lista.innerHTML = '<p style="color:var(--texto-sub);text-align:center;padding:1rem">No hay empleados registrados. Pide al administrador que los agregue.</p>';
-    return;
-  }
-
-  empleados.forEach(emp => {
-    const cargo = obtenerCargo(emp.cargo);
-    const estado = estadoEmpleadoHoy(emp.id);
-    const indicador = _indicadorEstado(estado);
+  
+  // Usamos for...of para poder usar 'await' correctamente dentro del ciclo
+  for (const emp of empleados) {
+    const cargo = obtenerCargo(emp.cargo); //
+    
+    // AQUÍ ESTÁ EL CAMBIO CLAVE: Esperamos el estado de cada uno
+    const estado = await estadoEmpleadoHoy(emp.id); 
+    
+    const indicador = _indicadorEstado(estado); //
 
     const btn = document.createElement('button');
     btn.className = 'empleado-btn';
@@ -61,7 +63,7 @@ async function cargarListaEmpleados() {
     `;
     btn.onclick = () => seleccionarEmpleado(emp);
     lista.appendChild(btn);
-  });
+  }
 }
 
 function _indicadorEstado(estado) {
